@@ -1,0 +1,38 @@
+name: UIUX Netlify Build
+
+on:
+  push:
+    branches:
+      - uiux-netlify-render
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.16.0'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build Angular production bundle
+        run: npm run build
+
+      - name: Generate Netlify runtime environment
+        run: node scripts/netlify-env.js
+
+      - name: Verify deploy artifact
+        run: |
+          test -f dist/web-app/browser/index.html
+          test -f dist/web-app/browser/assets/env.js
+          echo "Netlify artifact verified"

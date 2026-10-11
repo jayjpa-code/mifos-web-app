@@ -6,51 +6,138 @@
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
 
-@if (enableGlobalDashboard) {
-  <div class="layout-row align-end gap-2px responsive-column container m-b-20">
-    <div #buttonDashboard class="in-block">
-      <button mat-raised-button color="primary" [routerLink]="['/dashboard']">
-        <fa-icon icon="tachometer-alt" class="m-r-10"></fa-icon>
-        {{ 'labels.menus.Global Financial Dashboard' | translate }}
-      </button>
+<section class="workspace-shell">
+  <header class="workspace-hero">
+    <div class="hero-copy">
+      <span class="eyebrow">Banking Operations Workspace</span>
+      <h1>{{ 'labels.text.Welcome' | translate }}, {{ username }}</h1>
+      <p>
+        Run customer, lending, deposit and branch operations from one secure workspace for
+        <strong>{{ tenant | titlecase }}</strong
+        >.
+      </p>
     </div>
-  </div>
-}
 
-<div class="container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title class="title">
-        {{ 'labels.text.Welcome' | translate }} {{ username }} {{ 'labels.text.To' | translate }}
-        {{ tenant | titlecase }}!
-      </mat-card-title>
-    </mat-card-header>
+    <div class="hero-actions">
+      <button mat-flat-button color="primary" [routerLink]="['/clients/create']">
+        <fa-icon icon="user-plus"></fa-icon>
+        New client
+      </button>
+      <button mat-stroked-button [routerLink]="['/clients']">
+        <fa-icon icon="users"></fa-icon>
+        Find client
+      </button>
+      @if (enableGlobalDashboard) {
+        <button #buttonDashboard mat-stroked-button [routerLink]="['/dashboard']">
+          <fa-icon icon="tachometer-alt"></fa-icon>
+          Financial dashboard
+        </button>
+      }
+    </div>
+  </header>
 
-    <mat-card-content #searchActivity>
-      <div class="layout-column">
-        <mat-form-field>
-          <mat-label>{{ 'labels.placeholders.Search Activity' | translate }}</mat-label>
-          <input matInput [matAutocomplete]="activitySearch" [formControl]="searchText" />
-        </mat-form-field>
+  <section class="activity-search-card" #searchActivity>
+    <div class="search-copy">
+      <span class="section-kicker">Command centre</span>
+      <h2>What do you want to do?</h2>
+      <p>Search permitted banking activities and jump directly into the workflow.</p>
+    </div>
+
+    <mat-form-field appearance="outline" class="activity-search">
+      <mat-label>{{ 'labels.placeholders.Search Activity' | translate }}</mat-label>
+      <fa-icon matPrefix icon="magnifying-glass"></fa-icon>
+      <input matInput [matAutocomplete]="activitySearch" [formControl]="searchText" />
+    </mat-form-field>
+
+    <mat-autocomplete #activitySearch="matAutocomplete">
+      @for (activity of filteredActivities | async; track activity) {
+        <mat-option [routerLink]="activity.path">
+          <span>{{ activity.activity | translate }}</span>
+        </mat-option>
+      }
+    </mat-autocomplete>
+  </section>
+
+  <section class="workspace-grid">
+    <article class="workspace-card workspace-card-primary">
+      <div class="card-icon"><fa-icon icon="users"></fa-icon></div>
+      <div>
+        <span class="section-kicker">Customers</span>
+        <h3>Client management</h3>
+        <p>Onboard customers, maintain KYC information, view relationships and manage customer servicing.</p>
       </div>
+      <div class="card-actions">
+        <a mat-button [routerLink]="['/clients']">Open clients</a>
+        <a mat-button [routerLink]="['/clients/create']">Create client</a>
+      </div>
+    </article>
 
-      <mat-autocomplete #activitySearch="matAutocomplete">
-        @for (activity of filteredActivities | async; track activity) {
-          <mat-option [routerLink]="activity.path">
-            <span>{{ activity.activity | translate }}</span>
-          </mat-option>
-        }
-      </mat-autocomplete>
-    </mat-card-content>
+    <article class="workspace-card">
+      <div class="card-icon"><fa-icon icon="money-bill-transfer"></fa-icon></div>
+      <div>
+        <span class="section-kicker">Credit</span>
+        <h3>Loans & collections</h3>
+        <p>Originate, approve, disburse and service lending products with operational controls.</p>
+      </div>
+      <div class="card-actions">
+        <a mat-button [routerLink]="['/loans']">Open loans</a>
+        <a mat-button [routerLink]="['/collections']">Collections</a>
+      </div>
+    </article>
 
-    <img
-      mat-card-image
-      [src]="'assets/images/' + tenant + '_home.png'"
-      (error)="onImageMissing($event)"
-      alt="Mifos X"
-    />
-  </mat-card>
-</div>
+    <article class="workspace-card">
+      <div class="card-icon"><fa-icon icon="building-columns"></fa-icon></div>
+      <div>
+        <span class="section-kicker">Deposits</span>
+        <h3>Savings & deposit products</h3>
+        <p>Manage deposit products, customer accounts, balances, transactions and account servicing.</p>
+      </div>
+      <div class="card-actions">
+        <a mat-button [routerLink]="['/products']">Products</a>
+        <a mat-button [routerLink]="['/account-transfers']">Transfers</a>
+      </div>
+    </article>
+
+    <article class="workspace-card">
+      <div class="card-icon"><fa-icon icon="building"></fa-icon></div>
+      <div>
+        <span class="section-kicker">Network</span>
+        <h3>Branches, groups & centres</h3>
+        <p>Operate branch structures, centres and group-based banking workflows from a unified view.</p>
+      </div>
+      <div class="card-actions">
+        <a mat-button [routerLink]="['/centers']">Centres</a>
+        <a mat-button [routerLink]="['/groups']">Groups</a>
+      </div>
+    </article>
+
+    <article class="workspace-card">
+      <div class="card-icon"><fa-icon icon="chart-line"></fa-icon></div>
+      <div>
+        <span class="section-kicker">Control</span>
+        <h3>Accounting & reporting</h3>
+        <p>Review accounting operations, financial reporting and portfolio information.</p>
+      </div>
+      <div class="card-actions">
+        <a mat-button [routerLink]="['/accounting']">Accounting</a>
+        <a mat-button [routerLink]="['/reports']">Reports</a>
+      </div>
+    </article>
+
+    <article class="workspace-card">
+      <div class="card-icon"><fa-icon icon="list-check"></fa-icon></div>
+      <div>
+        <span class="section-kicker">Operations</span>
+        <h3>Tasks & administration</h3>
+        <p>Keep maker-checker work, organization settings, users and platform administration in control.</p>
+      </div>
+      <div class="card-actions">
+        <a mat-button [routerLink]="['/checker-inbox-and-tasks']">Tasks</a>
+        <a mat-button [routerLink]="['/organization']">Organization</a>
+      </div>
+    </article>
+  </section>
+</section>
 
 <ng-template #popoverButtons let-popover="popover" let-prev="prev" let-next="next">
   <div class="layout-row align-end gap-2px responsive-column">
