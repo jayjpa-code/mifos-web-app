@@ -1,0 +1,27 @@
+[build]
+  command = "npm ci && npm run build && node scripts/netlify-env.js"
+  publish = "dist/web-app/browser"
+
+[build.environment]
+  NODE_VERSION = "24.16.0"
+  NPM_FLAGS = "--no-audit --no-fund"
+
+# Angular currently uses hash-based routing, but this fallback also protects
+# future migration to path-based routes and direct deep links.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(self)"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
